@@ -1,0 +1,131 @@
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
+
+class Account {
+    private String accountNumber;
+    private String pin;
+    private double balance;
+
+    public Account(String accountNumber, String pin, double balance) {
+        this.accountNumber = accountNumber;
+        this.pin = pin;
+        this.balance = balance;
+    }
+
+    public String getAccountNumber() {
+        return accountNumber;
+    }
+
+    public String getPin() {
+        return pin;
+    }
+
+    public double getBalance() {
+        return balance;
+    }
+
+    public void setBalance(double balance) {
+        this.balance = balance;
+    }
+}
+
+class ATM {
+    private Map<String, Account> accounts = new HashMap<>();
+    private Scanner scanner = new Scanner(System.in);
+    private Account currentAccount;
+
+    public ATM() {
+        // Adding some dummy accounts for testing
+        accounts.put("123456", new Account("123456", "1234", 1000.00));
+        accounts.put("654321", new Account("654321", "4321", 2000.00));
+    }
+
+    public void start() {
+        while (true) {
+            System.out.println("Welcome to the ATM");
+            authenticateUser();
+            showMainMenu();
+        }
+    }
+
+    private void authenticateUser() {
+        System.out.println("Enter your account number:");
+        String accountNumber = scanner.nextLine();
+        System.out.println("Enter your PIN:");
+        String pin = scanner.nextLine();
+
+        Account account = accounts.get(accountNumber);
+        if (account != null && account.getPin().equals(pin)) {
+            currentAccount = account;
+            System.out.println("Authentication successful!");
+        } else {
+            System.out.println("Invalid account number or PIN. Please try again.");
+            authenticateUser();
+        }
+    }
+
+    private void showMainMenu() {
+        while (true) {
+            System.out.println("Main Menu:");
+            System.out.println("1. Withdrawal");
+            System.out.println("2. Deposit");
+            System.out.println("3. Balance Inquiry");
+            System.out.println("4. Exit");
+            System.out.print("Choose an option: ");
+
+            int choice = scanner.nextInt();
+            scanner.nextLine();  // Consume newline
+
+            switch (choice) {
+                case 1:
+                    performWithdrawal();
+                    break;
+                case 2:
+                    performDeposit();
+                    break;
+                case 3:
+                    performBalanceInquiry();
+                    break;
+                case 4:
+                    System.out.println("Thank you for using the ATM. Goodbye!");
+                    return;
+                default:
+                    System.out.println("Invalid option. Please try again.");
+            }
+        }
+    }
+
+    private void performWithdrawal() {
+        System.out.println("Enter the amount to withdraw:");
+        double amount = scanner.nextDouble();
+        scanner.nextLine();  // Consume newline
+
+        if (amount <= currentAccount.getBalance()) {
+            currentAccount.setBalance(currentAccount.getBalance() - amount);
+            System.out.println("Withdrawal successful. Your new balance is " + currentAccount.getBalance());
+        } else {
+            System.out.println("Insufficient funds. Your balance is " + currentAccount.getBalance());
+        }
+    }
+
+    private void performDeposit() {
+        System.out.println("Enter the amount to deposit:");
+        double amount = scanner.nextDouble();
+        scanner.nextLine();  // Consume newline
+
+        currentAccount.setBalance(currentAccount.getBalance() + amount);
+        System.out.println("Deposit successful. Your new balance is " + currentAccount.getBalance());
+    }
+
+    private void performBalanceInquiry() {
+        System.out.println("Your balance is " + currentAccount.getBalance());
+    }
+}
+
+public class ATMSimulation {
+    public static void main(String[] args) {
+        ATM atm = new ATM();
+        atm.start();
+    }
+}
